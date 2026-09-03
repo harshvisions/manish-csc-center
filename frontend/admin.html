@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin - Manish CSC Center & Electronics Shop</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2212%22 fill=%22%231e69d6%22/><text x=%2232%22 y=%2242%22 font-family=%22Arial%22 font-size=%2228%22 font-weight=%22bold%22 fill=%22white%22 text-anchor=%22middle%22>M</text></svg>" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <header class="admin-header">
+    <div class="container">
+      <div class="admin-brand">
+        <img class="brand-logo" src="images/logo.png" alt="Manish CSC Center logo" />
+        <div>
+          <h1 id="admin-brand">Manish CSC Center & Electronics Shop</h1>
+          <p>Admin Panel</p>
+        </div>
+      </div>
+      <a href="/" class="back-link">&larr; Back to site</a>
+    </div>
+  </header>
+
+  <main class="admin-main">
+
+    <section id="admin-login" class="panel admin-login">
+      <h2>Admin Login</h2>
+      <form id="login-form">
+        <div class="form-group">
+          <label for="admin-id">ID</label>
+          <input type="text" id="admin-id" name="id" autocomplete="username" required>
+        </div>
+        <div class="form-group">
+          <label for="admin-password">Password</label>
+          <input type="password" id="admin-password" name="password" autocomplete="current-password" required>
+        </div>
+        <div id="login-error" class="form-error" style="display:none;"></div>
+        <button type="submit" class="btn-submit">Login</button>
+      </form>
+    </section>
+
+    <div id="admin-content" class="admin-content" hidden>
+      <!-- add item form -->
+      <section class="panel">
+      <h2>Add New Item</h2>
+
+      <form id="item-form">
+        <div class="form-group">
+          <label for="title">Title</label>
+          <input type="text" id="title" name="title" placeholder="e.g. Aadhaar Card Update" required>
+        </div>
+
+        <div class="form-group">
+          <label for="category">Category</label>
+          <select id="category" name="category">
+            <option value="CSC Service">CSC Service</option>
+            <option value="Electronics">Electronics</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea id="description" name="description" placeholder="Short description of this product or service..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="image">Image</label>
+          <input type="file" id="image" name="image" accept="image/png, image/jpeg, image/webp, image/gif">
+          <img id="image-preview" alt="preview">
+        </div>
+
+        <div id="form-error" class="form-error" style="display:none;"></div>
+
+        <button type="submit" id="submit-btn" class="btn-submit">Add Item</button>
+      </form>
+      </section>
+
+      <section class="panel">
+        <h2>Add Update or Discount</h2>
+        <form id="update-form">
+          <div class="form-group">
+            <label for="update-title">Title</label>
+            <input type="text" id="update-title" name="update-title" placeholder="e.g. PAN Card Service Discount" required>
+          </div>
+          <div class="form-group">
+            <label for="update-category">Type</label>
+            <select id="update-category" name="update-category">
+              <option value="CSC Services">CSC Services</option>
+              <option value="Special Offer">Special Offer</option>
+              <option value="Repair Service">Repair Service</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="update-description">Details</label>
+            <textarea id="update-description" name="update-description" placeholder="Write the update or discount details..."></textarea>
+          </div>
+          <div class="form-group">
+            <label for="update-image">Image</label>
+            <input type="file" id="update-image" name="update-image" accept="image/png, image/jpeg, image/webp, image/gif">
+            <img id="update-image-preview" alt="preview">
+          </div>
+          <div id="update-form-error" class="form-error" style="display:none;"></div>
+          <button type="submit" id="update-submit-btn" class="btn-submit">Add Update</button>
+        </form>
+      </section>
+
+      <!-- existing items -->
+      <section class="panel">
+        <h2 id="items-heading">Existing Items</h2>
+        <div id="items-list"></div>
+      </section>
+
+      <section class="panel">
+        <h2 id="updates-heading">Existing Updates (0)</h2>
+        <div id="updates-list"></div>
+      </section>
+    </div>
+
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

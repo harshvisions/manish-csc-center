@@ -1,0 +1,6 @@
+server
+*.exe
+*.db
+uploads/*
+!uploads/.gitkeep
+*.log
