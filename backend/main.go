@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"sync"
 )
 
@@ -49,12 +50,22 @@ func main() {
 	mux.Handle("/uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir(uploadsDir))))
 
 	// --- static frontend (plain HTML/CSS/JS, no build step) ---
+	mux.HandleFunc("GET /admin.html", handleAdminPage)
 	mux.Handle("/", http.FileServer(http.Dir(frontendDir)))
 
 	handler := logRequests(mux)
 
 	log.Printf("Manish CSC Center running on port %s\n", port)
 	log.Fatal(http.ListenAndServe("0.0.0.0:"+port, handler))
+}
+
+func handleAdminPage(w http.ResponseWriter, r *http.Request) {
+	cookie, err := r.Cookie("admin_session")
+	if err != nil || !validSession(cookie.Value) {
+		http.Redirect(w, r, "/admin-login.html", http.StatusFound)
+		return
+	}
+	http.ServeFile(w, r, filepath.Join(frontendDir, "admin.html"))
 }
 
 func requireAdmin(next http.Handler) http.Handler {

@@ -663,6 +663,11 @@ img {
   justify-self: center;
 }
 
+.login-page-main {
+  min-height: calc(100vh - 64px);
+  align-content: center;
+}
+
 .admin-content {
   grid-column: 1 / -1;
   display: grid;

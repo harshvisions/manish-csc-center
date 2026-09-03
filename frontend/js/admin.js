@@ -1,39 +1,5 @@
 document.getElementById("admin-brand").textContent = SHOP.name;
 
-const loginForm = document.getElementById("login-form");
-const loginError = document.getElementById("login-error");
-const adminLogin = document.getElementById("admin-login");
-const adminContent = document.getElementById("admin-content");
-
-loginForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  loginError.style.display = "none";
-  const submitButton = loginForm.querySelector("button");
-  submitButton.disabled = true;
-  try {
-    const res = await fetch(`${API_BASE}/api/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id: document.getElementById("admin-id").value.trim(),
-        password: document.getElementById("admin-password").value,
-      }),
-    });
-    if (!res.ok) {
-      const body = await res.json().catch(() => ({}));
-      throw new Error(body.error || "Login failed");
-    }
-    adminLogin.hidden = true;
-    adminContent.hidden = false;
-    loadItems();
-  } catch (err) {
-    loginError.textContent = err.message;
-    loginError.style.display = "block";
-  } finally {
-    submitButton.disabled = false;
-  }
-});
-
 const form = document.getElementById("item-form");
 const submitBtn = document.getElementById("submit-btn");
 const formError = document.getElementById("form-error");
@@ -276,4 +242,6 @@ function escapeHtml(str) {
   div.textContent = str;
   return div.innerHTML;
 }
+
+loadItems();
 
