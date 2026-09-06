@@ -3,11 +3,13 @@ package main
 import (
 	"crypto/rand"
 	"encoding/hex"
+	"encoding/json"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 	"sync"
+	"time"
 )
 
 const (
@@ -33,11 +35,14 @@ func main() {
 	initDB("./manish_csc.db")
 	defer db.Close()
 
+	startTime := time.Now()
+
 	mux := http.NewServeMux()
 
 	// --- API routes ---
 	// Go 1.22+ mux supports method + path patterns natively, so we don't
 	// need an external router just for a handful of endpoints.
+	mux.HandleFunc("GET /health", handleHealth(startTime))
 	mux.HandleFunc("GET /api/items", handleGetItems)
 	mux.HandleFunc("GET /api/updates", handleGetUpdates)
 	mux.HandleFunc("POST /api/login", handleLogin)
@@ -92,6 +97,31 @@ func newSessionToken() (string, error) {
 		return "", err
 	}
 	return hex.EncodeToString(bytes), nil
+}
+
+// handleHealth returns a closure that serves GET /health.
+// It reports server status, uptime, and database reachability.
+func handleHealth(startTime time.Time) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		dbStatus := "ok"
+		if err := db.Ping(); err != nil {
+			dbStatus = "unreachable"
+		}
+
+		payload := map[string]interface{}{
+			"status":    "ok",
+			"uptime":    time.Since(startTime).String(),
+			"timestamp": time.Now().UTC().Format(time.RFC3339),
+			"database":  dbStatus,
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		if dbStatus != "ok" {
+			payload["status"] = "degraded"
+			w.WriteHeader(http.StatusServiceUnavailable)
+		}
+		json.NewEncoder(w).Encode(payload)
+	}
 }
 
 // logRequests is a tiny middleware that prints each request to stdout -
