@@ -73,6 +73,9 @@ function renderCatalog() {
 
   const cards = items.map(renderCard).join("");
   catalogContent.innerHTML = `<div class="grid">${cards}</div>`;
+  catalogContent.querySelectorAll("[data-add-to-cart]").forEach((button) => {
+    button.addEventListener("click", () => addToCart(button.dataset.addToCart));
+  });
 }
 
 function renderCard(item) {
@@ -93,8 +96,32 @@ function renderCard(item) {
         <span class="badge ${badgeClass}">${escapeHtml(item.category)}</span>
         <h3>${escapeHtml(item.title)}</h3>
         ${description}
+        ${item.category === "Electronics" ? `
+          <div class="card-order-row">
+            <strong>${formatCurrency(item.price)}</strong>
+            <button type="button" class="add-cart-btn" data-add-to-cart="${item.id}">Add to cart</button>
+          </div>` : ""}
       </div>
     </div>`;
+}
+
+function formatCurrency(value) {
+  return `Rs. ${Number(value || 0).toFixed(2)}`;
+}
+
+async function addToCart(itemId) {
+  const item = allItems.find((entry) => String(entry.id) === String(itemId));
+  if (!item || item.category !== "Electronics") return;
+  const response = await fetch(`${API_BASE}/api/customer/key`);
+  if (!response.ok) return;
+  const { customerKey } = await response.json();
+  const cartKey = `electronics-cart-${customerKey}`;
+  const cart = JSON.parse(localStorage.getItem(cartKey) || "[]");
+  const existing = cart.find((entry) => String(entry.id) === String(item.id));
+  if (existing) existing.quantity += 1;
+  else cart.push({ id: item.id, title: item.title, price: Number(item.price || 0), quantity: 1 });
+  localStorage.setItem(cartKey, JSON.stringify(cart));
+  window.location.href = "/cart.html";
 }
 
 function escapeHtml(str) {

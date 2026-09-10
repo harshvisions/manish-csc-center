@@ -46,6 +46,7 @@ func main() {
 	mux.HandleFunc("GET /api/items", handleGetItems)
 	mux.HandleFunc("GET /api/updates", handleGetUpdates)
 	mux.HandleFunc("POST /api/login", handleLogin)
+	mux.HandleFunc("GET /api/customer/key", handleCustomerKey)
 	mux.Handle("POST /api/items", requireAdmin(http.HandlerFunc(handleCreateItem)))
 	mux.Handle("DELETE /api/items/{id}", requireAdmin(http.HandlerFunc(handleDeleteItem)))
 	mux.Handle("POST /api/updates", requireAdmin(http.HandlerFunc(handleCreateUpdate)))

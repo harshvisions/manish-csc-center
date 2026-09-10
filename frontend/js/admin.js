@@ -51,6 +51,11 @@ form.addEventListener("submit", async (e) => {
     return;
   }
 
+  if (Number(form.price.value) < 0) {
+    showFormError("Please enter a valid non-negative price.");
+    return;
+  }
+
   const formData = new FormData(form);
   // FormData already picked up the image file automatically from the
   // <input type="file"> - no extra handling needed here.
@@ -213,6 +218,7 @@ function renderRow(item) {
       <div class="item-info">
         <div class="name">${escapeHtml(item.title)}</div>
         <span class="badge ${badgeClass}" style="margin-top:4px;">${escapeHtml(item.category)}</span>
+        <div class="desc">Price: Rs. ${Number(item.price || 0).toFixed(2)}</div>
         ${desc}
       </div>
       <button class="btn-delete" data-delete-id="${item.id}">Delete</button>

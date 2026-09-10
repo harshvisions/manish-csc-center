@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cart - Manish CSC Center & Electronics Shop</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2212%22 fill=%22%231e69d6%22/><text x=%2232%22 y=%2242%22 font-family=%22Arial%22 font-size=%2228%22 font-weight=%22bold%22 fill=%22white%22 text-anchor=%22middle%22>M</text></svg>" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a href="/" class="brand">
+        <img class="brand-logo" src="images/logo.png" alt="Manish CSC Center logo" />
+        <div class="brand-text">
+          <h1 id="brand-name">Manish CSC Center &amp; Electronics Shop</h1>
+          <p>Electronics cart</p>
+        </div>
+      </a>
+      <div class="contact-buttons">
+        <a href="/" class="btn-contact btn-email">Continue shopping</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="checkout-section cart-page">
+    <div class="container">
+      <span class="section-kicker">Electronics order</span>
+      <h2>Your cart</h2>
+      <div class="delivery-policy">
+        <strong>Delivery offer</strong>
+        <span>Free within 4 km on orders of Rs. 199 or more. Orders below Rs. 199 have a Rs. 30 delivery charge.</span>
+      </div>
+      <div class="checkout-layout">
+        <section>
+          <div id="cart-content" class="cart-content">
+            <p class="empty-note">Your electronics cart is empty.</p>
+          </div>
+          <a href="/" class="back-link cart-back-link">Back to products</a>
+        </section>
+
+        <form id="checkout-form" class="checkout-form">
+          <h2>Customer details</h2>
+          <p class="checkout-note">Your receipt will include these details and open in WhatsApp.</p>
+          <div class="form-group">
+            <label for="customer-name">Name</label>
+            <input id="customer-name" name="customer-name" type="text" required>
+          </div>
+          <div class="form-group">
+            <label for="customer-phone">Phone</label>
+            <input id="customer-phone" name="customer-phone" type="tel" autocomplete="tel" required>
+          </div>
+          <div class="form-group">
+            <label for="customer-location">Delivery location</label>
+            <textarea id="customer-location" name="customer-location" placeholder="Enter your address or use your current location" required></textarea>
+            <button type="button" id="location-btn" class="location-btn">Use my current location</button>
+            <small id="location-status" class="location-status"></small>
+          </div>
+          <button type="submit" id="receipt-btn" class="btn btn-whatsapp-solid" disabled>Make receipt &amp; share on WhatsApp</button>
+        </form>
+      </div>
+      <div id="receipt" class="receipt" hidden></div>
+    </div>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/cart.js"></script>
+</body>
+</html>

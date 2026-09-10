@@ -1,10 +1,13 @@
 package main
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -32,6 +35,19 @@ var allowedUpdateCategories = map[string]bool{
 	"CSC Services":   true,
 	"Special Offer":  true,
 	"Repair Service": true,
+}
+
+func handleCustomerKey(w http.ResponseWriter, r *http.Request) {
+	address := r.RemoteAddr
+	if forwarded := r.Header.Get("X-Forwarded-For"); forwarded != "" {
+		address = strings.TrimSpace(strings.Split(forwarded, ",")[0])
+	}
+	if host, _, err := net.SplitHostPort(address); err == nil {
+		address = host
+	}
+	salt := os.Getenv("CUSTOMER_KEY_SALT")
+	digest := sha256.Sum256([]byte(salt + ":" + address))
+	writeJSON(w, http.StatusOK, map[string]string{"customerKey": hex.EncodeToString(digest[:])})
 }
 
 func handleLogin(w http.ResponseWriter, r *http.Request) {
@@ -87,7 +103,7 @@ func writeError(w http.ResponseWriter, status int, msg string) {
 
 // GET /api/items - returns everything in the catalog, newest first.
 func handleGetItems(w http.ResponseWriter, r *http.Request) {
-	rows, err := db.Query(`SELECT id, title, category, description, image_url, created_at
+	rows, err := db.Query(`SELECT id, title, category, price, description, image_url, created_at
 		FROM items ORDER BY created_at DESC`)
 	if err != nil {
 		log.Println("query items:", err)
@@ -99,7 +115,7 @@ func handleGetItems(w http.ResponseWriter, r *http.Request) {
 	items := []Item{}
 	for rows.Next() {
 		var it Item
-		if err := rows.Scan(&it.ID, &it.Title, &it.Category, &it.Description, &it.ImageURL, &it.CreatedAt); err != nil {
+		if err := rows.Scan(&it.ID, &it.Title, &it.Category, &it.Price, &it.Description, &it.ImageURL, &it.CreatedAt); err != nil {
 			log.Println("scan item:", err)
 			continue
 		}
@@ -143,6 +159,7 @@ func handleCreateItem(w http.ResponseWriter, r *http.Request) {
 
 	title := strings.TrimSpace(r.FormValue("title"))
 	category := strings.TrimSpace(r.FormValue("category"))
+	price, err := strconv.ParseFloat(strings.TrimSpace(r.FormValue("price")), 64)
 	description := strings.TrimSpace(r.FormValue("description"))
 
 	if title == "" {
@@ -153,6 +170,10 @@ func handleCreateItem(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadRequest, "category must be 'CSC Service' or 'Electronics'")
 		return
 	}
+	if err != nil || price < 0 {
+		writeError(w, http.StatusBadRequest, "price must be a valid non-negative number")
+		return
+	}
 
 	imageURL, err := saveUploadedImage(r)
 	if err != nil {
@@ -161,8 +182,8 @@ func handleCreateItem(w http.ResponseWriter, r *http.Request) {
 	}
 
 	res, err := db.Exec(
-		`INSERT INTO items (title, category, description, image_url) VALUES (?, ?, ?, ?)`,
-		title, category, description, imageURL,
+		`INSERT INTO items (title, category, price, description, image_url) VALUES (?, ?, ?, ?, ?)`,
+		title, category, price, description, imageURL,
 	)
 	if err != nil {
 		log.Println("insert item:", err)
@@ -173,9 +194,9 @@ func handleCreateItem(w http.ResponseWriter, r *http.Request) {
 	id, _ := res.LastInsertId()
 
 	var it Item
-	err = db.QueryRow(`SELECT id, title, category, description, image_url, created_at
+	err = db.QueryRow(`SELECT id, title, category, price, description, image_url, created_at
 		FROM items WHERE id = ?`, id).
-		Scan(&it.ID, &it.Title, &it.Category, &it.Description, &it.ImageURL, &it.CreatedAt)
+		Scan(&it.ID, &it.Title, &it.Category, &it.Price, &it.Description, &it.ImageURL, &it.CreatedAt)
 	if err != nil {
 		log.Println("fetch inserted item:", err)
 		writeError(w, http.StatusInternalServerError, "item saved but could not be reloaded")

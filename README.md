@@ -104,6 +104,7 @@ Manish CSC Center running at http://localhost:8080
 Open in your browser:
 
 - Storefront: **http://localhost:8080/**
+- Electronics cart: **http://localhost:8080/cart.html**
 - Admin panel: **http://localhost:8080/admin.html**
 
 That's the whole setup. The SQLite database file and the `uploads/` folder
@@ -128,8 +129,8 @@ from inside `backend/`, same as `go run .`).
 
 | Method | Route | Body | Notes |
 |---|---|---|---|
-| GET | `/api/items` | — | returns all items, newest first |
-| POST | `/api/items` | `multipart/form-data`: `title`, `category`, `description`, `image` (file, optional) | `category` must be `CSC Service` or `Electronics` |
+| GET | `/api/items` | — | returns all items, newest first; each item includes `price` |
+| POST | `/api/items` | `multipart/form-data`: `title`, `category`, `price`, `description`, `image` (file, optional) | `category` must be `CSC Service` or `Electronics`; price must be non-negative |
 | DELETE | `/api/items/{id}` | — | deletes the row and its image file |
 | GET | `/api/updates` | — | returns homepage updates and discounts |
 | POST | `/api/updates` | `multipart/form-data`: `update-title`, `update-category`, `update-description`, `update-image` (file, optional) | admin session required |
@@ -189,6 +190,9 @@ required, the backend must first be rewritten as serverless API functions and
 SQLite/local uploads must be replaced with hosted database and file storage.
 
 ## Pushing to GitHub
+
+The electronics cart is separated by a privacy-preserving hash of the
+customer device IP address. No customer OTP or mobile login is required.
 
 ```bash
 cd manish-csc-center

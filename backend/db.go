@@ -45,5 +45,16 @@ func initDB(path string) {
 		log.Fatalf("could not create items table: %v", err)
 	}
 
+	var priceColumn int
+	err = db.QueryRow(`SELECT COUNT(*) FROM pragma_table_info('items') WHERE name = 'price'`).Scan(&priceColumn)
+	if err != nil {
+		log.Fatalf("could not inspect items table: %v", err)
+	}
+	if priceColumn == 0 {
+		if _, err = db.Exec(`ALTER TABLE items ADD COLUMN price REAL NOT NULL DEFAULT 0`); err != nil {
+			log.Fatalf("could not add item price column: %v", err)
+		}
+	}
+
 	log.Println("database ready:", path)
 }
